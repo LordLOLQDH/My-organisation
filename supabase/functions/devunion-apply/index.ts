@@ -52,27 +52,13 @@ Deno.serve(async (req: Request) => {
         const refResponse = await fetch(api + "/git/refs", { method: "POST", headers, body: JSON.stringify({ ref: "refs/heads/" + branch, sha: baseData.object.sha }) });
         if (!refResponse.ok) throw new Error("GitHub Branch konnte nicht erstellt werden: " + await refResponse.text());
         const md = [
-          "# Bewerbung als DevUnion Collaborator",
+          "# Neue DevUnion-Bewerbung",
           "",
-          "- **Name:** " + application.full_name,
-          "- **GitHub:** https://github.com/" + application.github_username,
-          "- **Kontakt:** " + application.email,
+          "GitHub: https://github.com/" + application.github_username,
           "",
-          "## Fähigkeiten",
-          application.skills,
-          "",
-          "## Motivation",
-          application.motivation,
-          "",
-          "## Erfahrung",
-          application.experience,
-          "",
-          "## Projekte",
-          application.project_links || "Keine Links angegeben.",
-          "",
-          "---",
+          "Die vollständigen Bewerbungsangaben werden aus Datenschutzgründen nicht im öffentlichen Repository veröffentlicht.",
           "Interne Bewerbungs-ID: " + saved.id
-        ].join("\n");
+        ].join("\\n");
         const fileResponse = await fetch(api + "/contents/applications/" + saved.id + ".md", {
           method: "PUT", headers,
           body: JSON.stringify({ message: "Bewerbung von " + application.github_username, content: b64(md), branch })
