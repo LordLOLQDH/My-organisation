@@ -136,7 +136,7 @@ Deno.serve(async (req: Request) => {
       status: prUrl && emailSent ? "completed" : prUrl ? "pr_created" : "received",
       email_sent: emailSent
     }).eq("id", saved.id);
-    return json({ ok: true, application_id: saved.id, pull_request: prUrl, email_sent: emailSent, setup_required: !ghToken || !resendKey });
+    return json({ ok: true, application_id: saved.id, pull_request: prUrl, email_sent: emailSent, setup_required: !ghToken || !resendKey, pull_request_error: prError, email_error: resendKey && !emailSent ? "E-Mail-Versand fehlgeschlagen." : null });
   } catch (error) {
     console.error(error);
     return json({ error: error instanceof Error ? error.message : "Interner Fehler" }, 500);
