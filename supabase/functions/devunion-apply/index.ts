@@ -58,7 +58,7 @@ Deno.serve(async (req: Request) => {
           "",
           "Die vollständigen Bewerbungsangaben werden aus Datenschutzgründen nicht im öffentlichen Repository veröffentlicht.",
           "Interne Bewerbungs-ID: " + saved.id
-        ].join("\\n");
+        ].join("\n");
         const fileResponse = await fetch(api + "/contents/applications/" + saved.id + ".md", {
           method: "PUT", headers,
           body: JSON.stringify({ message: "Bewerbung von " + application.github_username, content: b64(md), branch })
