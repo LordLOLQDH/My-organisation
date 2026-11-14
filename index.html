@@ -55,8 +55,17 @@ form.addEventListener("submit",async(e)=>{
   const response=await fetch(SUPABASE_URL+"/functions/v1/devunion-apply",{method:"POST",headers:{"Content-Type":"application/json","apikey":SUPABASE_ANON_KEY,"Authorization":"Bearer "+SUPABASE_ANON_KEY},body:JSON.stringify(data)});
   const result=await response.json().catch(()=>({}));
   if(!response.ok)throw new Error(result.error||"Die Bewerbung konnte nicht gesendet werden.");
-  if(result.pull_request && result.email_sent){statusBox.className="status show ok";statusBox.textContent="Bewerbung eingegangen. Pull Request erstellt und Benachrichtigung an DevUnion gesendet.";}else{statusBox.className="status show err";statusBox.textContent="Bewerbung wurde gespeichert, aber die Automatisierung ist noch nicht vollständig eingerichtet. Bitte versuche es später erneut.";}
-  form.reset();
+  if(result.pull_request && result.email_sent){
+   statusBox.className="status show ok";
+   statusBox.textContent="Bewerbung eingegangen. Pull Request erstellt und Benachrichtigung an DevUnion gesendet.";
+   form.reset();
+  }else{
+   statusBox.className="status show err";
+   const problems=[];
+   if(!result.pull_request)problems.push("GitHub: "+(result.pull_request_error||"Pull Request konnte nicht erstellt werden."));
+   if(!result.email_sent)problems.push("E-Mail: "+(result.email_error||"FormSubmit hat den Versand nicht bestätigt. Falls es die erste Nutzung ist, bestätige zuerst die Aktivierungs-E-Mail von FormSubmit."));
+   statusBox.textContent="Bewerbung wurde gespeichert, aber ein Schritt ist fehlgeschlagen. "+problems.join(" ");
+  }
  }catch(err){statusBox.className="status show err";statusBox.textContent=err.message||"Es ist ein Fehler aufgetreten. Bitte versuche es später erneut.";}
  finally{button.disabled=false;button.textContent="Bewerbung absenden";}
 });
