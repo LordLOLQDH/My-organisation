@@ -6,7 +6,7 @@ Statische Bewerbungswebsite für [DevUnion by Adam](https://github.com/DevUnion-
 - Supabase-Projekt: KDS-AI-v1
 - Edge Function: `devunion-apply`
 - Tabelle: `public.devunion_applications`
-- Jede Bewerbung wird gespeichert, erzeugt einen Pull Request in `DevUnion-by-Adam/Contributing-LordLOLQDH` und sendet eine E-Mail an `adam_kraus@icloud.com`.
+- Jede Bewerbung wird gespeichert, erzeugt einen Pull Request in `DevUnion-by-Adam/Contributing-LordLOLQDH` und sendet eine E-Mail an `adam_kraus@icloud.com`. Persönliche Bewerbungsdetails stehen nicht im öffentlichen PR.
 
 ## Erforderliche Supabase Function Secrets
 Vor dem Livebetrieb müssen diese Secrets im Supabase Dashboard unter Edge Functions → Secrets gesetzt werden:
