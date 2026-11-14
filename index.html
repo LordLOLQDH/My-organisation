@@ -55,7 +55,7 @@ form.addEventListener("submit",async(e)=>{
   const response=await fetch(SUPABASE_URL+"/functions/v1/devunion-apply",{method:"POST",headers:{"Content-Type":"application/json","apikey":SUPABASE_ANON_KEY,"Authorization":"Bearer "+SUPABASE_ANON_KEY},body:JSON.stringify(data)});
   const result=await response.json().catch(()=>({}));
   if(!response.ok)throw new Error(result.error||"Die Bewerbung konnte nicht gesendet werden.");
-  statusBox.className="status show ok";statusBox.textContent="Deine Bewerbung ist eingegangen. Wir haben sie zur Prüfung eingereicht. Du erhältst eine Rückmeldung per E-Mail.";
+  if(result.pull_request && result.email_sent){statusBox.className="status show ok";statusBox.textContent="Bewerbung eingegangen. Pull Request erstellt und Benachrichtigung an DevUnion gesendet.";}else{statusBox.className="status show err";statusBox.textContent="Bewerbung wurde gespeichert, aber die Automatisierung ist noch nicht vollständig eingerichtet. Bitte versuche es später erneut.";}
   form.reset();
  }catch(err){statusBox.className="status show err";statusBox.textContent=err.message||"Es ist ein Fehler aufgetreten. Bitte versuche es später erneut.";}
  finally{button.disabled=false;button.textContent="Bewerbung absenden";}
