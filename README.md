@@ -14,3 +14,6 @@ Vor dem Livebetrieb müssen diese Secrets im Supabase Dashboard unter Edge Funct
 - `RESEND_API_KEY`: API-Key von Resend. Für produktive Zustellung muss die Absenderdomain bei Resend verifiziert sein. Der aktuelle Test-Absender ist `onboarding@resend.dev`; für eine eigene Domain den From-Wert in der Function entsprechend anpassen.
 
 Supabase stellt `SUPABASE_URL` und `SUPABASE_SERVICE_ROLE_KEY` der Edge Function automatisch bereit. Niemals Service-Role-Keys im Frontend hinterlegen.
+
+## GitHub Pages
+Der Workflow unter `.github/workflows/pages.yml` veröffentlicht die Website bei Pushes auf `main`. Falls Pages noch nicht aktiviert ist: Repository Settings → Pages → Build and deployment → Source: GitHub Actions.
