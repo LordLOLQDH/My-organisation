@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f7f9fc"><meta name="description" content="Werde Teil von DevUnion. Bewirb dich als Collaborator und entwickle gemeinsam mit uns neue Projekte.">
+<title>DevUnion | Bewerbung</title>
+<style>
+:root{color-scheme:light;--ink:#152238;--muted:#627086;--line:#e1e7ef;--blue:#2457d6;--blue2:#1744b3;--soft:#eef3ff;--paper:#fff;--bg:#f7f9fc}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}.wrap{width:min(1100px,calc(100% - 40px));margin:auto}
+header{height:76px;display:flex;align-items:center;border-bottom:1px solid var(--line);background:#ffffffd9;backdrop-filter:blur(12px)}.nav{display:flex;align-items:center;justify-content:space-between}.brand{display:flex;align-items:center;gap:11px;font-weight:800;letter-spacing:-.04em;font-size:20px}.mark{width:34px;height:34px;border-radius:10px;background:var(--ink);color:white;display:grid;place-items:center;font-size:15px}.nav a{font-size:14px;font-weight:650;color:var(--muted)}
+.hero{padding:78px 0 56px;display:grid;grid-template-columns:1.2fr .8fr;gap:48px;align-items:center}.eyebrow{display:inline-flex;gap:8px;align-items:center;background:var(--soft);color:var(--blue);padding:6px 11px;border-radius:999px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.dot{width:7px;height:7px;border-radius:50%;background:var(--blue)}h1{font-size:clamp(42px,6vw,68px);line-height:1.02;letter-spacing:-.065em;margin:20px 0 18px;max-width:680px}.hero p{font-size:18px;color:var(--muted);max-width:610px;margin:0}.hero-card{background:var(--ink);color:white;border-radius:22px;padding:28px;box-shadow:0 20px 50px #15223818}.hero-card .small{color:#aab8ce;font-size:12px;text-transform:uppercase;letter-spacing:.12em;font-weight:750}.hero-card h2{font-size:24px;letter-spacing:-.04em;margin:10px 0}.hero-card p{font-size:14px;color:#c4cede}.perks{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px}.perk{border:1px solid #ffffff25;border-radius:13px;padding:13px;font-size:13px;color:#e6ebf4}.perk b{display:block;color:white;font-size:15px;margin-bottom:2px}
+main{padding:16px 0 90px}.section-head{margin:0 0 24px}.section-head h2{font-size:30px;letter-spacing:-.045em;margin:0 0 5px}.section-head p{margin:0;color:var(--muted)}.layout{display:grid;grid-template-columns:.72fr 1.28fr;gap:24px;align-items:start}.side,.form-card{background:var(--paper);border:1px solid var(--line);border-radius:18px}.side{padding:24px;position:sticky;top:20px}.side h3{margin:0 0 14px;font-size:17px}.step{display:flex;gap:12px;margin:16px 0}.num{flex:none;width:26px;height:26px;border-radius:8px;background:var(--soft);color:var(--blue);display:grid;place-items:center;font-size:12px;font-weight:800}.step b{display:block;font-size:14px}.step span{display:block;color:var(--muted);font-size:13px}.side .rules{border-top:1px solid var(--line);margin-top:22px;padding-top:18px;color:var(--muted);font-size:13px}.form-card{padding:30px}.form-card h3{font-size:21px;letter-spacing:-.03em;margin:0 0 4px}.form-card>p{margin:0 0 24px;color:var(--muted);font-size:14px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.field{margin-bottom:16px}.field.full{grid-column:1/-1}label{display:block;font-size:13px;font-weight:750;margin:0 0 7px}label em{font-style:normal;color:var(--muted);font-weight:500}input,textarea{width:100%;border:1px solid #d9e0ea;border-radius:10px;padding:12px 13px;font:inherit;font-size:14px;color:var(--ink);background:#fff;outline:none;transition:border .15s,box-shadow .15s}input:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px #2457d61a}textarea{min-height:112px;resize:vertical}input::placeholder,textarea::placeholder{color:#9aa6b7}.hint{font-size:12px;color:var(--muted);margin-top:5px}.check{display:flex;gap:10px;align-items:flex-start;margin:6px 0 20px;color:var(--muted);font-size:12px}.check input{width:16px;height:16px;margin-top:3px;flex:none}.btn{width:100%;border:0;border-radius:11px;background:var(--blue);color:white;padding:14px 18px;font:inherit;font-weight:750;cursor:pointer;transition:background .15s,transform .15s}.btn:hover{background:var(--blue2);transform:translateY(-1px)}.btn:disabled{opacity:.6;cursor:wait;transform:none}.status{display:none;padding:13px 15px;border-radius:10px;margin-top:15px;font-size:14px}.status.show{display:block}.status.ok{background:#edf8f1;color:#17633a}.status.err{background:#fff0f0;color:#9d2929}.hp{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden}footer{border-top:1px solid var(--line);padding:24px 0;color:var(--muted);font-size:13px}.foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+@media(max-width:780px){.hero{grid-template-columns:1fr;padding:54px 0 38px;gap:28px}.layout{grid-template-columns:1fr}.side{position:static;order:2}.form-card{padding:22px}.wrap{width:min(100% - 28px,620px)}h1{font-size:48px}.hero-card{padding:23px}}@media(max-width:480px){.grid{grid-template-columns:1fr;gap:0}.field.full{grid-column:auto}.hero p{font-size:16px}.perks{gap:9px}.perk{padding:11px;font-size:12px}}
+</style>
+</head>
+<body>
+<header><div class="wrap nav"><a class="brand" href="https://github.com/DevUnion-by-Adam" aria-label="DevUnion GitHub"><span class="mark">D</span>DevUnion</a><a href="https://github.com/DevUnion-by-Adam">Organisation ansehen ↗</a></div></header>
+<div class="wrap">
+<section class="hero">
+<div><span class="eyebrow"><span class="dot"></span> Open applications</span><h1>Baue mit uns.<br>Werde Teil von DevUnion.</h1><p>Wir suchen neugierige Menschen, die Ideen in echte Projekte verwandeln wollen. Ob Code, Design, Tests oder neue Einfälle: Gute Zusammenarbeit zählt mehr als ein perfekter Lebenslauf.</p></div>
+<div class="hero-card"><div class="small">Deine Chance</div><h2>Von der Idee zum gemeinsamen Projekt.</h2><p>Arbeite mit anderen an Web-Apps, KI-Tools, Browser-Games und Experimenten.</p><div class="perks"><div class="perk"><b>Entwickeln</b>Eigene Ideen umsetzen</div><div class="perk"><b>Lernen</b>Gemeinsam besser werden</div><div class="perk"><b>Mitgestalten</b>Features und Projekte</div><div class="perk"><b>Zusammenarbeiten</b>Als Teil des Teams</div></div></div>
+</section>
+<main>
+<div class="section-head"><h2>Deine Bewerbung</h2><p>Fülle das Formular aus. Wir schauen uns jede Bewerbung persönlich an.</p></div>
+<div class="layout">
+<aside class="side"><h3>So läuft es ab</h3><div class="step"><div class="num">1</div><div><b>Formular absenden</b><span>Deine Angaben werden sicher übermittelt.</span></div></div><div class="step"><div class="num">2</div><div><b>Pull Request</b><span>Deine Bewerbung wird als PR zur Prüfung eingereicht.</span></div></div><div class="step"><div class="num">3</div><div><b>Rückmeldung</b><span>Wir melden uns per E-Mail bei dir.</span></div></div><div class="rules"><b>Was wir erwarten</b><br>Respektvoller Umgang, ein GitHub-Konto und Lust auf Zusammenarbeit. Keine Malware, kein Spam und keine gestohlenen Inhalte.</div></aside>
+<section class="form-card"><h3>Erzähl uns von dir</h3><p>Pflichtfelder sind mit * markiert. Dein Alter musst du nicht angeben.</p>
+<form id="apply">
+<div class="grid">
+<div class="field"><label for="name">Name *</label><input id="name" name="full_name" autocomplete="name" maxlength="100" required placeholder="Dein Name"></div>
+<div class="field"><label for="github">GitHub-Benutzername *</label><input id="github" name="github_username" maxlength="39" required placeholder="z. B. octocat"></div>
+<div class="field full"><label for="email">E-Mail-Adresse *</label><input id="email" name="email" type="email" autocomplete="email" maxlength="254" required placeholder="du@beispiel.de"></div>
+<div class="field full"><label for="skills">Was kannst du gut? *</label><textarea id="skills" name="skills" maxlength="1500" required placeholder="Programmierung, Design, Testing, Ideen ..."></textarea></div>
+<div class="field full"><label for="motivation">Warum möchtest du bei DevUnion mitmachen? *</label><textarea id="motivation" name="motivation" minlength="10" maxlength="4000" required placeholder="Was motiviert dich und wobei möchtest du helfen?"></textarea></div>
+<div class="field full"><label for="experience">Welche Erfahrungen hast du bisher? *</label><textarea id="experience" name="experience" maxlength="2000" required placeholder="Erzähl kurz von deinen bisherigen Projekten oder deinem Lernstand."></textarea></div>
+<div class="field full"><label for="links">Links zu Projekten <em>(optional)</em></label><textarea id="links" name="project_links" maxlength="1500" placeholder="https://github.com/..."></textarea><div class="hint">Mehrere Links einfach in neue Zeilen schreiben.</div></div>
+</div>
+<div class="hp" aria-hidden="true"><label for="website">Website</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>
+<label class="check"><input type="checkbox" id="consent" required><span>Ich bestätige, dass meine Angaben zur Bearbeitung meiner Bewerbung an DevUnion übermittelt und dafür gespeichert werden dürfen. *</span></label>
+<button class="btn" id="submit" type="submit">Bewerbung absenden</button>
+<div class="status" id="status" role="status" aria-live="polite"></div>
+</form>
+</section></div></main>
+</div>
+<footer><div class="wrap foot"><span>© 2026 DevUnion by Adam</span><span><a href="https://github.com/DevUnion-by-Adam">GitHub Organisation</a> · Bewerbungsformular</span></div></footer>
+<script>
+const SUPABASE_URL="https://eopvkwhcgznvubesaszv.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_d3hVgDqwTuB63BtfumPwoQ_ngy2ig_c";
+const form=document.getElementById("apply"),button=document.getElementById("submit"),statusBox=document.getElementById("status");
+form.addEventListener("submit",async(e)=>{
+ e.preventDefault();if(!form.reportValidity())return;
+ button.disabled=true;button.textContent="Wird gesendet …";statusBox.className="status";statusBox.textContent="";
+ const data=Object.fromEntries(new FormData(form).entries());
+ try{
+  const response=await fetch(SUPABASE_URL+"/functions/v1/devunion-apply",{method:"POST",headers:{"Content-Type":"application/json","apikey":SUPABASE_ANON_KEY,"Authorization":"Bearer "+SUPABASE_ANON_KEY},body:JSON.stringify(data)});
+  const result=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error(result.error||"Die Bewerbung konnte nicht gesendet werden.");
+  statusBox.className="status show ok";statusBox.textContent="Deine Bewerbung ist eingegangen. Wir haben sie zur Prüfung eingereicht. Du erhältst eine Rückmeldung per E-Mail.";
+  form.reset();
+ }catch(err){statusBox.className="status show err";statusBox.textContent=err.message||"Es ist ein Fehler aufgetreten. Bitte versuche es später erneut.";}
+ finally{button.disabled=false;button.textContent="Bewerbung absenden";}
+});
+</script>
+</body></html>
