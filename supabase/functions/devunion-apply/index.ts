@@ -86,43 +86,58 @@ Deno.serve(async (req: Request) => {
     }
 
     let emailSent = false;
-    const resendKey = Deno.env.get("RESEND_API_KEY");
-    if (resendKey) {
-      const emailText = [
-        "Neue DevUnion-Bewerbung",
-        "",
-        "Name: " + application.full_name,
-        "GitHub: https://github.com/" + application.github_username,
-        "E-Mail: " + application.email,
-        "",
-        "Fähigkeiten:",
-        application.skills,
-        "",
-        "Motivation:",
-        application.motivation,
-        "",
-        "Erfahrung:",
-        application.experience,
-        "",
-        "Projektlinks:",
-        application.project_links || "Keine angegeben",
-        "",
-        "Pull Request: " + (prUrl || "Nicht erstellt"),
-        "Bewerbungs-ID: " + saved.id
-      ].join("\n");
-      const mailResponse = await fetch("https://api.resend.com/emails", {
+    let emailError: string | null = null;
+    const emailText = [
+      "Neue DevUnion-Bewerbung",
+      "",
+      "Name: " + application.full_name,
+      "GitHub: https://github.com/" + application.github_username,
+      "E-Mail: " + application.email,
+      "",
+      "Fähigkeiten:",
+      application.skills,
+      "",
+      "Motivation:",
+      application.motivation,
+      "",
+      "Erfahrung:",
+      application.experience,
+      "",
+      "Projektlinks:",
+      application.project_links || "Keine angegeben",
+      "",
+      "Pull Request: " + (prUrl || "Nicht erstellt"),
+      "Bewerbungs-ID: " + saved.id
+    ].join("\n");
+    try {
+      const mailResponse = await fetch("https://formsubmit.co/ajax/adam_kraus@icloud.com", {
         method: "POST",
-        headers: { "Authorization": "Bearer " + resendKey, "Content-Type": "application/json" },
-        body: JSON.stringify({ from: "DevUnion Bewerbungen <onboarding@resend.dev>", to: ["adam_kraus@icloud.com"], subject: "Neue DevUnion-Bewerbung: " + application.github_username, text: emailText })
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({
+          name: application.full_name,
+          email: application.email,
+          _replyto: application.email,
+          _subject: "Neue DevUnion-Bewerbung: " + application.github_username,
+          _template: "table",
+          message: emailText
+        })
       });
-      emailSent = mailResponse.ok;
-      if (!emailSent) console.error("Resend error:", await mailResponse.text());
+      const mailData = await mailResponse.json().catch(() => ({}));
+      emailSent = mailResponse.ok && String(mailData.success) === "true";
+      if (!emailSent) {
+        emailError = mailData.message || JSON.stringify(mailData) || "FormSubmit hat die E-Mail nicht bestätigt.";
+        console.error("FormSubmit error:", emailError);
+      }
+    } catch (error) {
+      emailError = error instanceof Error ? error.message : String(error);
+      console.error("FormSubmit request failed:", emailError);
     }
+
     await supabase.from("devunion_applications").update({
       status: prUrl && emailSent ? "completed" : prUrl ? "pr_created" : "received",
       email_sent: emailSent
     }).eq("id", saved.id);
-    return json({ ok: true, application_id: saved.id, pull_request: prUrl, email_sent: emailSent, setup_required: !ghToken || !resendKey, pull_request_error: prError, email_error: resendKey && !emailSent ? "E-Mail-Versand fehlgeschlagen." : null });
+    return json({ ok: true, application_id: saved.id, pull_request: prUrl, email_sent: emailSent, setup_required: !ghToken, pull_request_error: prError, email_error: emailError });
   } catch (error) {
     console.error(error);
     return json({ error: error instanceof Error ? error.message : "Interner Fehler" }, 500);
