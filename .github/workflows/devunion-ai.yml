@@ -1,7 +1,7 @@
 name: DevUnion AI PR Moderation
 
 on:
-  pull_request_target:
+  pull_request:
     types: [opened, reopened, synchronize, ready_for_review]
   issue_comment:
     types: [created]
@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   review-and-moderate:
-    if: github.event_name == 'pull_request_target' || github.event.issue.pull_request != null
+    if: github.event_name == 'pull_request' || github.event.issue.pull_request != null
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
