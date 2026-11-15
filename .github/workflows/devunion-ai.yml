@@ -231,30 +231,30 @@ jobs:
               ? result.recommendation
               : 'needs-more-info';
             body = `<!-- devunion-ai-review -->
-## DevUnion KI-Review
-
-**Vorläufige Empfehlung:** ${recommendation}
-
-${String(result.summary || 'Die KI konnte keine Zusammenfassung erstellen.').slice(0, 5000)}
-
-### Einzelbewertung
-- **Fähigkeiten:** ${String(assessment.skills || 'Nicht ausreichend bewertet.')}
-- **Motivation:** ${String(assessment.motivation || 'Nicht ausreichend bewertet.')}
-- **Erfahrung:** ${String(assessment.experience || 'Nicht ausreichend bewertet.')}
-- **Projekte:** ${String(assessment.projects || 'Keine ausreichenden Projektinformationen.')}
-
-### Stärken
-${String(assessment.strengths || 'Keine konkreten Stärken benannt.')}
-
-### Lücken
-${String(assessment.gaps || 'Keine konkreten Lücken benannt.')}
-
-### Rückfragen
-${String(assessment.questions || 'Keine Rückfragen.')}
-
-**Labels:** ${[...new Set(labels)].join(', ')}
-
-_Automatische Ersteinschätzung. Die finale Entscheidung trifft das DevUnion-Team._`;
+          ## DevUnion KI-Review
+          
+          **Vorläufige Empfehlung:** ${recommendation}
+          
+          ${String(result.summary || 'Die KI konnte keine Zusammenfassung erstellen.').slice(0, 5000)}
+          
+          ### Einzelbewertung
+          - **Fähigkeiten:** ${String(assessment.skills || 'Nicht ausreichend bewertet.')}
+          - **Motivation:** ${String(assessment.motivation || 'Nicht ausreichend bewertet.')}
+          - **Erfahrung:** ${String(assessment.experience || 'Nicht ausreichend bewertet.')}
+          - **Projekte:** ${String(assessment.projects || 'Keine ausreichenden Projektinformationen.')}
+          
+          ### Stärken
+          ${String(assessment.strengths || 'Keine konkreten Stärken benannt.')}
+          
+          ### Lücken
+          ${String(assessment.gaps || 'Keine konkreten Lücken benannt.')}
+          
+          ### Rückfragen
+          ${String(assessment.questions || 'Keine Rückfragen.')}
+          
+          **Labels:** ${[...new Set(labels)].join(', ')}
+          
+          _Automatische Ersteinschätzung. Die finale Entscheidung trifft das DevUnion-Team._`;
           }
 
           if (isComment) {
