@@ -27,17 +27,18 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPOSITORY: ${{ github.repository }}
           EVENT_NAME: ${{ github.event_name }}
-          EVENT_PATH: ${{ github.event_path }}
           SERVER_URL: ${{ github.server_url }}
         run: |
           node <<'NODE'
           const fs = require('node:fs');
 
-          const event = JSON.parse(fs.readFileSync(process.env.EVENT_PATH, 'utf8'));
+          const event = JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
           const [owner, repo] = process.env.REPOSITORY.split('/');
           const isComment = process.env.EVENT_NAME === 'issue_comment';
           const prNumber = isComment ? event.issue.number : event.pull_request.number;
-          const api = process.env.SERVER_URL === 'https://github.com'\n  ? 'https://api.github.com'\n  : `${process.env.SERVER_URL}/api/v3`;
+          const api = process.env.SERVER_URL === 'https://github.com'
+  ? 'https://api.github.com'
+  : `${process.env.SERVER_URL}/api/v3`;
           const token = process.env.GH_TOKEN;
           const headers = {
             Authorization: `Bearer ${token}`,
