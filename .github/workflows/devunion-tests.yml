@@ -1,0 +1,56 @@
+name: DevUnion application tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate website and application data
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run smoke tests
+        shell: bash
+        run: |
+          git fetch origin main
+          CHANGED_APPLICATIONS="$(git diff --name-only origin/main...HEAD -- 'applications/*.md' | tr '\n' ' ')"
+          export CHANGED_APPLICATIONS
+          node <<'NODE'
+          const fs = require('node:fs');
+          const assert = require('node:assert/strict');
+
+          const html = fs.readFileSync('index.html', 'utf8');
+          const fn = fs.readFileSync('supabase/functions/devunion-apply/index.ts', 'utf8');
+
+          for (const field of ['full_name', 'github_username', 'email', 'skills', 'motivation', 'experience', 'project_links']) {
+            assert(html.includes('name="' + field + '"'), 'Formularfeld fehlt: ' + field);
+          }
+          assert(html.includes('/functions/v1/devunion-apply'), 'Supabase-Endpoint fehlt');
+          assert(html.includes('öffentlichen GitHub-PR'), 'Hinweis auf öffentliche Bewerbungsdaten fehlt');
+          assert(fn.includes('const repo = "LordLOLQDH/My-organisation";'), 'PR-Zielrepository ist falsch');
+          assert(fn.includes('PR_CREATOR_GITHUB'), 'GitHub-Token-Secret PR_CREATOR_GITHUB wird nicht verwendet');
+          for (const field of ['application.skills', 'application.motivation', 'application.experience', 'application.project_links']) {
+            assert(fn.includes(field), 'Bewerbungsangabe wird nicht verarbeitet: ' + field);
+          }
+
+          const files = (process.env.CHANGED_APPLICATIONS || '').trim().split(/\s+/).filter(Boolean);
+          for (const file of files) {
+            const md = fs.readFileSync(file, 'utf8');
+            for (const heading of ['## Bewerber', '## Fähigkeiten', '## Motivation', '## Bisherige Erfahrungen', '## Projektlinks']) {
+              assert(md.includes(heading), file + ': Abschnitt fehlt: ' + heading);
+            }
+            assert(!/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(md), file + ': E-Mail-Adresse darf nicht öffentlich in der PR stehen');
+          }
+
+          console.log('Alle DevUnion-Smoke-Tests bestanden.');
+          console.log('Geprüfte Bewerbungsdateien: ' + files.length);
+          NODE
