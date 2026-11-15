@@ -37,8 +37,8 @@ jobs:
           const isComment = process.env.EVENT_NAME === 'issue_comment';
           const prNumber = isComment ? event.issue.number : event.pull_request.number;
           const api = process.env.SERVER_URL === 'https://github.com'
-  ? 'https://api.github.com'
-  : `${process.env.SERVER_URL}/api/v3`;
+          ? 'https://api.github.com'
+          : `${process.env.SERVER_URL}/api/v3`;
           const token = process.env.GH_TOKEN;
           const headers = {
             Authorization: `Bearer ${token}`,
