@@ -142,7 +142,17 @@ jobs:
           Bei Bewerbungen bewerte getrennt: Fähigkeiten und Passung, Motivation und Verständlichkeit, bisherige Erfahrung, Qualität/Relevanz der Projektlinks. Nenne konkrete positive Punkte, Lücken und sinnvolle Rückfragen. Gib eine vorläufige Empfehlung als "invite", "needs-more-info" oder "decline", aber triff keine endgültige automatische Aufnahmeentscheidung. Wenn die PR keine Bewerbungsdatei oder keine Bewerbungsantworten enthält, melde ausdrücklich, dass eine Bewertung nicht möglich ist. Erfinde keine Fakten. Bei technischen Problemen gib konkrete, schrittweise Hilfestellung. Antworte auf Deutsch, wenn der Beitrag Deutsch ist, sonst in der Sprache des Beitrags.
           JSON-Schema:
           {
-            "summary": "PR-Zusammenfassung mit Zweck, wichtigsten Änderungen und möglichen Risiken",
+            "summary": "Konkrete Zusammenfassung mit belegten Stärken, Lücken und Risiken",
+            "recommendation": "invite oder needs-more-info oder decline",
+            "application_assessment": {
+              "skills": "Bewertung der Fähigkeiten",
+              "motivation": "Bewertung der Motivation",
+              "experience": "Bewertung der bisherigen Erfahrung",
+              "projects": "Bewertung der Projektlinks",
+              "strengths": "konkrete Stärken",
+              "gaps": "konkrete Lücken",
+              "questions": "sinnvolle Rückfragen"
+            },
             "labels": ["nur erlaubte Labels"],
             "reply": "Hilfreiche Antwort auf den neuen Kommentar; bei PR-Review eine kurze Review-Zusammenfassung",
             "severity": "none oder review oder critical",
@@ -159,7 +169,7 @@ jobs:
             body: JSON.stringify({
               model: 'openai/gpt-4o-mini',
               temperature: 0.1,
-              max_tokens: 1100,
+              max_tokens: 1800,
               messages: [
                 { role: 'system', content: system },
                 { role: 'user', content: JSON.stringify(input) }
@@ -214,7 +224,37 @@ jobs:
           if (isComment) {
             body = `## DevUnion KI\n\n${String(result.reply || 'Danke für deinen Beitrag. Ein Teammitglied wird sich das ansehen.').slice(0, 7000)}`;
           } else {
-            body = `<!-- devunion-ai-review -->\n## DevUnion KI-Review\n\n${String(result.summary || 'Die KI konnte keine Zusammenfassung erstellen.').slice(0, 7000)}\n\n**Labels:** ${[...new Set(labels)].join(', ')}\n\n_Automatische Ersteinschätzung. Die finale Entscheidung trifft das DevUnion-Team._`;
+            const assessment = result.application_assessment && typeof result.application_assessment === 'object'
+              ? result.application_assessment
+              : {};
+            const recommendation = ['invite', 'needs-more-info', 'decline'].includes(result.recommendation)
+              ? result.recommendation
+              : 'needs-more-info';
+            body = `<!-- devunion-ai-review -->
+## DevUnion KI-Review
+
+**Vorläufige Empfehlung:** ${recommendation}
+
+${String(result.summary || 'Die KI konnte keine Zusammenfassung erstellen.').slice(0, 5000)}
+
+### Einzelbewertung
+- **Fähigkeiten:** ${String(assessment.skills || 'Nicht ausreichend bewertet.')}
+- **Motivation:** ${String(assessment.motivation || 'Nicht ausreichend bewertet.')}
+- **Erfahrung:** ${String(assessment.experience || 'Nicht ausreichend bewertet.')}
+- **Projekte:** ${String(assessment.projects || 'Keine ausreichenden Projektinformationen.')}
+
+### Stärken
+${String(assessment.strengths || 'Keine konkreten Stärken benannt.')}
+
+### Lücken
+${String(assessment.gaps || 'Keine konkreten Lücken benannt.')}
+
+### Rückfragen
+${String(assessment.questions || 'Keine Rückfragen.')}
+
+**Labels:** ${[...new Set(labels)].join(', ')}
+
+_Automatische Ersteinschätzung. Die finale Entscheidung trifft das DevUnion-Team._`;
           }
 
           if (isComment) {
