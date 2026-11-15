@@ -10,7 +10,6 @@ permissions:
   contents: read
   issues: write
   pull-requests: write
-  models: read
 
 concurrency:
   group: devunion-ai-pr-${{ github.event.pull_request.number || github.event.issue.number }}
@@ -25,6 +24,7 @@ jobs:
       - name: Analyze PR and comments with GitHub Models
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           REPOSITORY: ${{ github.repository }}
           EVENT_NAME: ${{ github.event_name }}
           SERVER_URL: ${{ github.server_url }}
@@ -160,16 +160,17 @@ jobs:
             "moderation_reason": "kurze Begründung oder leer"
           }`;
 
-          const modelResponse = await fetch('https://models.github.ai/inference/chat/completions', {
+          const modelResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
             headers: {
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              model: 'openai/gpt-4o-mini',
+              model: 'llama-3.3-70b-versatile',
               temperature: 0.1,
-              max_tokens: 1800,
+              max_completion_tokens: 1800,
+              response_format: { type: 'json_object' },
               messages: [
                 { role: 'system', content: system },
                 { role: 'user', content: JSON.stringify(input) }
@@ -177,8 +178,11 @@ jobs:
             })
           });
           const modelText = await modelResponse.text();
-          if (!modelResponse.ok) throw new Error(`GitHub Models ${modelResponse.status}: ${modelText.slice(0, 1500)}`);
-          const modelJson = JSON.parse(modelText);
+          if (!process.env.GROQ_API_KEY) throw new Error('GROQ_API_KEY fehlt in den GitHub Actions Secrets.');
+          if (!modelResponse.ok) throw new Error(`Groq API ${modelResponse.status}: ${modelText.slice(0, 1500)}`);
+          let modelJson;
+          try { modelJson = JSON.parse(modelText); }
+          catch { throw new Error('Groq lieferte keine JSON-Antwort: ' + modelText.slice(0, 500)); }
           const raw = modelJson.choices?.[0]?.message?.content || '';
           const match = raw.match(/\{[\s\S]*\}/);
           if (!match) throw new Error('KI hat kein gültiges JSON geliefert: ' + raw.slice(0, 500));
