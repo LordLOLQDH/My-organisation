@@ -30,7 +30,7 @@ jobs:
           SERVER_URL: ${{ github.server_url }}
         run: |
           node <<'NODE'
-          const fs = require('node:fs');
+          import fs from 'node:fs';
 
           const event = JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
           const [owner, repo] = process.env.REPOSITORY.split('/');
