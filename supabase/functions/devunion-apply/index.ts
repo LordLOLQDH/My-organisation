@@ -128,7 +128,12 @@ Deno.serve(async (req: Request) => {
     try {
       const mailResponse = await fetch("https://formsubmit.co/ajax/adam_kraus@icloud.com", {
         method: "POST",
-        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Origin": "https://lordlolqdh.github.io",
+          "Referer": "https://lordlolqdh.github.io/My-organisation/"
+        },
         body: JSON.stringify({
           name: application.full_name,
           email: application.email,
