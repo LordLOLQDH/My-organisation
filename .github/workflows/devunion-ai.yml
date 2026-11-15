@@ -7,7 +7,7 @@ on:
     types: [created]
 
 permissions:
-  contents: read
+  contents: write
   issues: write
   pull-requests: write
 
@@ -120,11 +120,13 @@ jobs:
             applicationFiles.push({
               filename: file.filename,
               status: file.status,
+              sha: blob.sha,
               content: content.slice(0, 14000)
             });
           }
 
           const comment = isComment ? event.comment : null;
+          const canUpdateApplication = Boolean(isComment && comment?.user?.login && comment.user.login === pr.user?.login && pr.head.repo?.full_name === process.env.REPOSITORY);
           if (isComment && (!comment || comment.user?.type === 'Bot' || comment.user?.login === 'github-actions[bot]')) {
             console.log('Bot-Kommentar ignoriert.');
             process.exit(0);
@@ -132,7 +134,7 @@ jobs:
 
           const input = {
             task: isComment
-              ? 'Beantworte ausschließlich den konkreten neuen Kommentar. Nutze dafür den vollständigen PR-Kontext und insbesondere application_files. Wenn es eine Bewerbung ist, lies die Bewerbungsdatei und berücksichtige bereits im Kommentar genannte Ergänzungen. Gib keine allgemeinen Projekt-Setup-Anweisungen, wenn nicht tatsächlich nach dem Ausführen von Software gefragt wurde. Erkläre bei einer Bewerbung, dass sie nicht ausgeführt werden muss. Wenn nach "run" gefragt wird, prüfe zuerst, ob überhaupt ein ausführbares Softwareprojekt vorliegt; ein GitHub-Profil oder Bewerbungs-PR ist kein ausführbares Projekt. Bitte bei fehlenden Informationen gezielt um konkrete Angaben. Antworte kurz, konkret und auf Deutsch.'
+              ? 'Beantworte den konkreten neuen Kommentar anhand des vollständigen PR-Kontexts und application_files. Wenn der PR-Autor in seinem Kommentar konkrete Bewerbungsangaben ergänzt (z. B. Fähigkeiten, Motivation, Erfahrung oder Projektlinks), aktualisiere die passende Bewerbungsdatei direkt: Gib unter application_updates den vollständigen aktualisierten Markdown-Inhalt zurück. Übernimm ausschließlich ausdrücklich genannte Fakten, erfinde nichts, bewahre alle bestehenden Angaben und Abschnitte, die Bewerbungs-ID und den Datenschutzhinweis, und veröffentliche niemals eine E-Mail-Adresse. Aktualisiere nur eine bereits geladene Datei unter applications/. Bei Fragen, allgemeinen Kommentaren oder Kommentaren anderer Personen bleibt application_updates leer. Ein Bewerbungs-PR muss nicht ausgeführt werden. Gib keine allgemeinen npm-/Python-Setup-Anweisungen für Bewerbungen. Antworte kurz, konkret und auf Deutsch.'
               : 'Prüfe den Pull Request anhand der tatsächlich geladenen application_files und des Diffs. Wenn eine Datei unter applications/ vorhanden ist, handelt es sich um eine DevUnion-Bewerbung: lies ihren vollständigen Inhalt und bewerte die tatsächlichen Antworten zu Fähigkeiten, Motivation, Erfahrung und Projektlinks. Verwende keine Aussagen, die den Dateiinhalt ignorieren. Wenn keine Bewerbungsdatei geladen wurde, sage ausdrücklich, dass die Datei nicht gefunden oder nicht lesbar war. Erfinde keine fehlenden Angaben. Schreibe eine klare Zusammenfassung und ordne passende Labels zu.',
             pull_request: {
               title: pr.title,
@@ -174,7 +176,8 @@ jobs:
             "reply": "Hilfreiche Antwort auf den neuen Kommentar; bei PR-Review eine kurze Review-Zusammenfassung",
             "severity": "none oder review oder critical",
             "confidence": 0.0,
-            "moderation_reason": "kurze Begründung oder leer"
+            "moderation_reason": "kurze Begründung oder leer",
+            "application_updates": [{"filename": "exakter Pfad einer bereits geladenen Bewerbungsdatei", "content": "vollständiger aktualisierter Markdown-Inhalt"}]
           }`;
 
           if (!process.env.GROQ_API_KEY) throw new Error('GROQ_API_KEY fehlt in den GitHub Actions Secrets.');
@@ -235,6 +238,28 @@ jobs:
             process.exit(0);
           }
 
+          const updatedApplicationFiles = [];
+          if (canUpdateApplication && Array.isArray(result.application_updates)) {
+            for (const update of result.application_updates) {
+              const existing = applicationFiles.find(file => file.filename === update?.filename);
+              if (!existing || typeof update.content !== 'string' || !existing.sha) continue;
+              if (update.content.length > 20000 || /[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}/i.test(update.content)) continue;
+              if (update.content === existing.content) continue;
+              const encodedPath = existing.filename.split('/').map(encodeURIComponent).join('/');
+              await github(`/contents/${encodedPath}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  message: 'Bewerbungsangaben durch DevUnion-KI ergänzt',
+                  content: Buffer.from(update.content, 'utf8').toString('base64'),
+                  sha: existing.sha,
+                  branch: pr.head.ref
+                })
+              });
+              updatedApplicationFiles.push(existing.filename);
+            }
+          }
+
           const labels = Array.isArray(result.labels) ? result.labels.filter(x =>
             ['type: feature','type: bug','type: docs','type: security','priority: high','status: needs-changes','status: ready-for-review','help wanted'].includes(x)
           ) : [];
@@ -244,7 +269,10 @@ jobs:
 
           let body;
           if (isComment) {
-            body = `## DevUnion KI\n\n${String(result.reply || 'Danke für deinen Beitrag. Ein Teammitglied wird sich das ansehen.').slice(0, 7000)}`;
+            const updateNotice = updatedApplicationFiles.length
+              ? `**Bewerbungsdatei automatisch aktualisiert:** ${updatedApplicationFiles.join(', ')}. Die Änderung wurde direkt in diesen Pull Request übernommen.\n\n`
+              : '';
+            body = `## DevUnion KI\n\n${updateNotice}${String(result.reply || 'Danke für deinen Beitrag. Ein Teammitglied wird sich das ansehen.').slice(0, 7000)}`;
           } else {
             const assessment = result.application_assessment && typeof result.application_assessment === 'object'
               ? result.application_assessment
