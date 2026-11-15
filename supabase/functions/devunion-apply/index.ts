@@ -42,7 +42,7 @@ Deno.serve(async (req: Request) => {
     const ghToken = Deno.env.get("GITHUB_TOKEN");
     if (ghToken) {
       try {
-        const repo = "DevUnion-by-Adam/Contributing-LordLOLQDH";
+        const repo = "LordLOLQDH/My-organisation";
         const api = "https://api.github.com/repos/" + repo;
         const headers = { "Authorization": "Bearer " + ghToken, "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28", "Content-Type": "application/json" };
         const baseResponse = await fetch(api + "/git/ref/heads/main", { headers });
@@ -52,12 +52,28 @@ Deno.serve(async (req: Request) => {
         const refResponse = await fetch(api + "/git/refs", { method: "POST", headers, body: JSON.stringify({ ref: "refs/heads/" + branch, sha: baseData.object.sha }) });
         if (!refResponse.ok) throw new Error("GitHub Branch konnte nicht erstellt werden: " + await refResponse.text());
         const md = [
-          "# Neue DevUnion-Bewerbung",
+          "# DevUnion-Bewerbung",
           "",
-          "GitHub: https://github.com/" + application.github_username,
+          "> Hinweis: Diese Bewerbungsdatei liegt in einem öffentlichen GitHub-Repository. Die veröffentlichte Version enthält die Angaben, denen die bewerbende Person ausdrücklich zugestimmt hat. Die E-Mail-Adresse wird niemals hier veröffentlicht.",
           "",
-          "Die vollständigen Bewerbungsangaben werden aus Datenschutzgründen nicht im öffentlichen Repository veröffentlicht.",
-          "Interne Bewerbungs-ID: " + saved.id
+          "## Bewerber",
+          "- GitHub: [@" + application.github_username + "](https://github.com/" + application.github_username + ")",
+          "- Name: " + application.full_name,
+          "",
+          "## Fähigkeiten",
+          application.skills,
+          "",
+          "## Motivation",
+          application.motivation,
+          "",
+          "## Bisherige Erfahrungen",
+          application.experience,
+          "",
+          "## Projektlinks",
+          application.project_links || "Keine angegeben",
+          "",
+          "## Interne Referenz",
+          "Bewerbungs-ID: " + saved.id
         ].join("\n");
         const fileResponse = await fetch(api + "/contents/applications/" + saved.id + ".md", {
           method: "PUT", headers,
@@ -69,9 +85,9 @@ Deno.serve(async (req: Request) => {
           body: JSON.stringify({
             title: "Bewerbung: " + application.github_username,
             head: branch, base: "main",
-            body: "Neue Bewerbung über die DevUnion-Website.\n\n**Name:** " + application.full_name +
+            body: "Neue DevUnion-Bewerbung. Die vollständigen, zur Veröffentlichung freigegebenen Antworten stehen in `applications/" + saved.id + ".md`.\n\n**Name:** " + application.full_name +
               "\n**GitHub:** @" + application.github_username +
-              "\n\nBitte die Bewerbungsdetails in `applications/" + saved.id + ".md` prüfen.\n\nBewerbungs-ID: " + saved.id
+              "\n\nBitte prüfe Fähigkeiten, Motivation, Erfahrung und Projektlinks in der Bewerbungsdatei. Die E-Mail-Adresse bleibt privat in Supabase.\n\nBewerbungs-ID: " + saved.id
           })
         });
         const prData = await prResponse.json();
