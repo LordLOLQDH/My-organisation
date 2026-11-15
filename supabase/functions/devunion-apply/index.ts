@@ -39,7 +39,7 @@ Deno.serve(async (req: Request) => {
 
     let prUrl: string | null = null;
     let prError: string | null = null;
-    const ghToken = Deno.env.get("GITHUB_TOKEN");
+    const ghToken = Deno.env.get("PR_CREATOR_GITHUB");
     if (ghToken) {
       try {
         const repo = "LordLOLQDH/My-organisation";
