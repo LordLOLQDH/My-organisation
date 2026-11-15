@@ -134,7 +134,7 @@ jobs:
 
           const priorComments = isComment
             ? (await github(`/issues/${prNumber}/comments?per_page=100`))
-                .filter(item => item.user?.type !== 'Bot' && item.user?.login !== 'github-actions[bot]')
+                .filter(item => item.user?.login === pr.user?.login)
                 .slice(-20)
                 .map(item => ({ author: item.user?.login, body: (item.body || '').slice(0, 3000) }))
             : [];
