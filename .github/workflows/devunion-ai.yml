@@ -132,6 +132,13 @@ jobs:
             process.exit(0);
           }
 
+          const priorComments = isComment
+            ? (await github(`/issues/${prNumber}/comments?per_page=100`))
+                .filter(item => item.user?.type !== 'Bot' && item.user?.login !== 'github-actions[bot]')
+                .slice(-20)
+                .map(item => ({ author: item.user?.login, body: (item.body || '').slice(0, 3000) }))
+            : [];
+
           const input = {
             task: isComment
               ? 'Beantworte den konkreten neuen Kommentar anhand des vollständigen PR-Kontexts und application_files. Wenn der PR-Autor in seinem Kommentar konkrete Bewerbungsangaben ergänzt (z. B. Fähigkeiten, Motivation, Erfahrung oder Projektlinks), aktualisiere die passende Bewerbungsdatei direkt: Gib unter application_updates den vollständigen aktualisierten Markdown-Inhalt zurück. Übernimm ausschließlich ausdrücklich genannte Fakten, erfinde nichts, bewahre alle bestehenden Angaben und Abschnitte, die Bewerbungs-ID und den Datenschutzhinweis, und veröffentliche niemals eine E-Mail-Adresse. Aktualisiere nur eine bereits geladene Datei unter applications/. Bei Fragen, allgemeinen Kommentaren oder Kommentaren anderer Personen bleibt application_updates leer. Ein Bewerbungs-PR muss nicht ausgeführt werden. Gib keine allgemeinen npm-/Python-Setup-Anweisungen für Bewerbungen. Antworte kurz, konkret und auf Deutsch.'
@@ -151,7 +158,8 @@ jobs:
               author: comment.user?.login,
               body: (comment.body || '').slice(0, 6000),
               url: comment.html_url
-            } : null
+            } : null,
+            prior_comments: priorComments
           };
 
           const system = `Du bist die DevUnion-Moderations- und Support-KI. Antworte ausschließlich mit gültigem JSON, ohne Markdown-Codeblock.
@@ -243,7 +251,7 @@ jobs:
             for (const update of result.application_updates) {
               const existing = applicationFiles.find(file => file.filename === update?.filename);
               if (!existing || typeof update.content !== 'string' || !existing.sha) continue;
-              if (update.content.length > 20000 || /[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}/i.test(update.content)) continue;
+              if (update.content.length > 20000 || /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(update.content)) continue;
               if (update.content === existing.content) continue;
               const encodedPath = existing.filename.split('/').map(encodeURIComponent).join('/');
               await github(`/contents/${encodedPath}`, {
